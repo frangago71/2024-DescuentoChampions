@@ -66,6 +66,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: new Date()
       },
+      percentage: {
+        type: Sequelize.DOUBLE,
+        defaultValue: 0.0
+      },
       userId: {
         allowNull: false,
         type: Sequelize.INTEGER,

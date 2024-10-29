@@ -1,4 +1,4 @@
-import { Restaurant, Product, RestaurantCategory, ProductCategory } from '../models/models.js'
+import { Restaurant, Product, RestaurantCategory, ProductCategory, sequelizeSession } from '../models/models.js'
 
 const index = async function (req, res) {
   try {
@@ -71,11 +71,19 @@ const show = async function (req, res) {
 }
 
 const update = async function (req, res) {
+  const t = await sequelizeSession.transaction()
   try {
-    await Restaurant.update(req.body, { where: { id: req.params.restaurantId } })
+    await Restaurant.update(req.body, { where: { id: req.params.restaurantId } }, t) // Actualiza el porcentaje del restaurante 
+    const productos = await Product.findAll({ where: { restaurantId: req.params.restaurantId } }) // Busca los productos del restaurante
+    for (const prod of productos) {
+      const newPrice = prod.basePrice + prod.basePrice * (req.body.percentage / 100);
+      await prod.update({ price: newPrice }, t); //  Actualiza el precio de cada producto
+    }
+    await t.commit() // Confirma la transacción
     const updatedRestaurant = await Restaurant.findByPk(req.params.restaurantId)
-    res.json(updatedRestaurant)
+    res.json(updatedRestaurant) // Devuelve el restaurante actualizado
   } catch (err) {
+    await t.rollback()
     res.status(500).send(err)
   }
 }

@@ -13,6 +13,13 @@ const create = [
   check('phone').optional({ nullable: true, checkFalsy: true }).isString().isLength({ min: 1, max: 255 }).trim(),
   check('restaurantCategoryId').exists({ checkNull: true }).isInt({ min: 1 }).toInt(),
   check('userId').not().exists(),
+  // check('percentage').exists().isFloat({ min: -5, max:5}).toFloat(), no vale porque incluye a 5 y -5
+  check('percentage')
+    .exists()
+    .isFloat()
+    .custom(value => value > -5 && value < 5)
+    .toFloat(),
+  check('percentage').exists().isFloat({ min: -5, max: 5 }).toFloat(),
   check('heroImage').custom((value, { req }) => {
     return checkFileIsImage(req, 'heroImage')
   }).withMessage('Please upload an image with format (jpeg, png).'),
@@ -37,6 +44,12 @@ const update = [
   check('phone').optional({ nullable: true, checkFalsy: true }).isString().isLength({ min: 1, max: 255 }).trim(),
   check('restaurantCategoryId').exists({ checkNull: true }).isInt({ min: 1 }).toInt(),
   check('userId').not().exists(),
+  // check('percentage').exists().isFloat({ min: -5, max:5}).toFloat(), no vale porque incluye a 5 y -5
+  check('percentage')
+    .exists()
+    .isFloat()
+    .custom(value => value > -5 && value < 5)
+    .toFloat(),
   check('heroImage').custom((value, { req }) => {
     return checkFileIsImage(req, 'heroImage')
   }).withMessage('Please upload an image with format (jpeg, png).'),
